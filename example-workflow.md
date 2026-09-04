@@ -28,7 +28,7 @@ sqlite_execute: UPDATE settings SET value = 'ClearAir Radon' WHERE key = 'busine
 sqlite_execute: UPDATE settings SET value = '-05:00' WHERE key = 'timezone_offset';
 ```
 
-> Saved. I'll schedule everything in Central time (-05:00). You don't have the Place Record or Retrieve Record forms yet; they're free to create. Place Record is a device photo plus closed-house Yes/No. Retrieve Record is the pCi/L reading plus a device photo. No signature — these are internal placement/retrieve logs, not a certified lab report. Want me to set them up now?
+> Saved. I'll schedule everything in Central time (-05:00). You don't have the Place Record or Retrieve Record forms yet; they're free to create. Place Record is a device photo plus closed-house Yes/No. Retrieve Record is a pCi/L field note plus a device photo. No signature — these are internal placement/retrieve logs, not an official MAH-2023 measurement, not a certified radon report, and not an NRPP device PDF. Want me to set them up now?
 
 Owner: *"yes"*
 
@@ -42,7 +42,7 @@ form_create:
 ```json
 [
   {"type": "section", "label": "Place record", "identifier": "sec_place",
-   "text": "Photograph the device in place. Confirm closed-house conditions. This is an internal placement log, not a certified lab report and not a state disclosure form."},
+   "text": "Photograph the device in place. Confirm closed-house conditions. This is an internal placement log, not the official ANSI/AARST MAH-2023 measurement, not a certified radon report, and not an NRPP / NRSB / C-NRPP device PDF."},
   {"type": "photo", "label": "Device placed", "identifier": "device_placed", "required": true, "max_images": 1},
   {"type": "select", "label": "Closed house", "identifier": "closed_house", "required": true,
    "options": ["Yes", "No"]},
@@ -64,7 +64,7 @@ form_create:
 ```json
 [
   {"type": "section", "label": "Retrieve record", "identifier": "sec_retrieve",
-   "text": "Enter the pCi/L reading and photograph the device as retrieved. This is an internal retrieve log, not a certified lab report."},
+   "text": "Enter the pCi/L reading as a field note and photograph the device as retrieved. This is an internal retrieve log. The pCi/L here is not the certified CRM / lab / NRPP device PDF and not an official MAH-2023 or Health Canada measurement."},
   {"type": "number", "label": "pCi/L", "identifier": "pci_l", "required": true},
   {"type": "photo", "label": "Device retrieved", "identifier": "device_retrieved", "required": true, "max_images": 1},
   {"type": "textarea", "label": "Notes", "identifier": "notes"}
@@ -108,7 +108,7 @@ Owner: *"yes"*
 
 ```
 location_create:
-  name: "Dana Walsh - 4412 Maple Street"
+  name: "P-1 - 4412 Maple Street"
   street_address: "4412 Maple Street, Des Moines, IA 50312"
   checkin_radius_m: 75
   idempotency_key: "loc-property-1"
@@ -152,7 +152,7 @@ sqlite_execute:
   -- trigger: protocol → short_term; two visits seeded (place 2026-09-07, retrieve 2026-09-10)
 ```
 
-> Added Dana Walsh, 4412 Maple Street. Short-term $175, RDN-2026-0001. Place Mon Sep 7 at 9:00, retrieve Thu Sep 10. The gate code is saved on your computer only; give it to Kim directly. Her ZenSched event runs through Nov 5.
+> Added Dana Walsh, 4412 Maple Street. Short-term $175, RDN-2026-0001. Place Mon Sep 7 at 9:00, retrieve Thu Sep 10. The ZenSched label is "P-1 - 4412 Maple Street" — her name stays local. The gate code is saved on your computer only; give it to Kim directly. Her ZenSched event runs through Nov 5.
 
 ## "Add a listing test for realtor Pat Okonkwo, pat@example.com, 515-555-0190, 890 Walnut Ave, Ames IA 50010, place Tuesday 2026-09-08 at 11, $175. Vacant house, lockbox 4092."
 
@@ -177,7 +177,7 @@ sqlite_execute:
   → lastInsertRowid = 2
 
 location_create:
-  name: "Pat Okonkwo - 890 Walnut Ave"
+  name: "P-2 - 890 Walnut Ave"
   street_address: "890 Walnut Ave, Ames, IA 50010"
   checkin_radius_m: 75
   idempotency_key: "loc-property-2"
@@ -205,7 +205,7 @@ sqlite_execute:
   -- trigger: test_no → RDN-2026-0002; retrieve_date → 2026-09-11
 ```
 
-> Added Pat Okonkwo (realtor), 890 Walnut Ave. Short-term $175, RDN-2026-0002. Place Tue Sep 8 at 11:00, retrieve Fri Sep 11. This is not a lab report; if the buyer needs the state disclosure, that's still your certifying-body form. Lockbox note is local only.
+> Added Pat Okonkwo (realtor), 890 Walnut Ave. Short-term $175, RDN-2026-0002. Place Tue Sep 8 at 11:00, retrieve Fri Sep 11. The ZenSched label is "P-2 - 890 Walnut Ave" — no client name. This is not an official MAH-2023 measurement or NRPP device PDF; if the buyer needs the state disclosure, that's still your certifying-body form. Lockbox note is local only.
 
 ## "Invite Kim Alvarez, kim@example.com, and make her the default."
 
@@ -344,10 +344,10 @@ form_export:
   → row_count: 2, rows: [
       { submission_id: 4501, worker_id: 611, event_id: 7201, submitted_at: "2026-09-07 09:18:12",
         data: { closed_house: "yes", notes: "Basement rec room, 20 in off floor, away from sump." },
-        media: [ { cdn_url: "https://cdn.zensched.com/m/.../p1.jpg" } ] },
+        media: [ { field_id: 12, cdn_url: "https://cdn.zensched.com/m/.../p1.jpg", thumbnail_url: "https://cdn.zensched.com/m/.../p1-t.jpg", original_filename: "p1.jpg" } ] },
       { submission_id: 4502, worker_id: 611, event_id: 7202, submitted_at: "2026-09-08 11:14:40",
         data: { closed_house: "yes", notes: "Vacant, HVAC off, first-floor bedroom." },
-        media: [ { cdn_url: "https://cdn.zensched.com/m/.../p2.jpg" } ] }
+        media: [ { field_id: 12, cdn_url: "https://cdn.zensched.com/m/.../p2.jpg", thumbnail_url: "https://cdn.zensched.com/m/.../p2-t.jpg", original_filename: "p2.jpg" } ] }
     ]
     billing: { meter: "form_media", units: 2, price: 0.30 }
 
@@ -359,7 +359,7 @@ form_export:
   → row_count: 1, rows: [
       { submission_id: 4503, worker_id: 611, event_id: 7201, submitted_at: "2026-09-10 09:16:05",
         data: { pci_l: 6.2, notes: "Seal intact." },
-        media: [ { cdn_url: "https://cdn.zensched.com/m/.../r1.jpg" } ] }
+        media: [ { field_id: 22, cdn_url: "https://cdn.zensched.com/m/.../r1.jpg", thumbnail_url: "https://cdn.zensched.com/m/.../r1-t.jpg", original_filename: "r1.jpg" } ] }
     ]
     billing: { meter: "form_media", units: 1, price: 0.15 }
 
@@ -401,7 +401,7 @@ sqlite_execute:
 
 > Recorded 3 visits, all GPS-verified.
 >
-> **High reading — Thursday, Walsh retrieve (RDN-2026-0001):** 6.2 pCi/L, above your 4.0 action level. Closed-house Yes. Seal intact. This is your copy from the phone, not a lab report.
+> **High reading — Thursday, Walsh retrieve (RDN-2026-0001):** 6.2 pCi/L (field note, not the certified CRM / NRPP PDF), above your 4.0 action level. Closed-house Yes. Seal intact. This is your copy from the phone, not an official MAH-2023 measurement.
 >
 > Okonkwo listing is still in the house (placed Tue; retrieve Fri). Dana's on-demand date is cleared.
 
@@ -413,14 +413,14 @@ sqlite_query: SELECT * FROM closed_house_log WHERE place_date BETWEEN '2026-09-0
     RDN-2026-0002 | 2026-09-08 / 2026-09-11 | Yes | NULL | 890 Walnut Ave | Pat Okonkwo
 ```
 
-> Your copy from the phone forms — not a lab report:
+> Your copy from the phone forms — not an official MAH-2023 measurement, not a certified radon report, and not an NRPP device PDF. The pCi/L is a field note:
 >
 > | Test | Place | Retrieve | Closed-house | pCi/L | Property |
 > |---|---|---|---|---|---|
 > | RDN-2026-0001 | Sep 7 | Sep 10 | Yes | 6.2 | 4412 Maple Street |
 > | RDN-2026-0002 | Sep 8 | Sep 11 | Yes | — | 890 Walnut Ave (still out) |
 >
-> Walsh is on `tests_high`. Keep whatever Iowa DPH / NRPP wants on their form separately.
+> Walsh is on `tests_high`. Keep the official MAH-2023 / Iowa DPH / NRPP device PDF on their form separately.
 
 ## "Draft invoices for everyone with uninvoiced work."
 
@@ -460,6 +460,7 @@ The agent then writes the invoice out as text:
 >
 > Total due: $175.00
 > Both visits GPS-verified at the property.
+> Not an official MAH-2023 measurement, certified radon report, or NRPP device PDF.
 > ```
 >
 > Say "sent" when it's out and I'll note the date.
@@ -475,11 +476,17 @@ sqlite_execute: UPDATE invoices SET paid = 1, paid_date = date('now') WHERE invo
 
 ## Ninety days later: "Schedule this week" (long-term retrieve)
 
-A long-term test placed Sep 7 has retrieve_date Dec 6 (place + 90 days). The property event ended Nov 5.
+A long-term test placed Sep 7 has retrieve_date Dec 6 (place + 90 days). The property event ended Nov 5. US Central DST ended the first Sunday of November (2026-11-01). Des Moines is now `-06:00`.
 
 ```
+sqlite_execute: UPDATE settings SET value = '-06:00' WHERE key = 'timezone_offset';
+
 sqlite_query: SELECT * FROM visits_due;
-  → 2026-12-06 | retrieve | … | evt 7201 | event_valid_until 2026-11-05 | event_needs_roll 1 | ...
+  → 2026-12-06 | retrieve | … | evt 7201 | event_valid_until 2026-11-05 | event_needs_roll 1
+               | event_idempotency_key event-property-1-20261206
+               | start_iso 2026-12-06T09:00:00-06:00
+  -- retrieve row uses the NEW window key (visit date), not event-property-1-20260907
+  -- (reusing the place-window key would replay the expired event)
 
 event_create:
   location_id: 9201
@@ -489,15 +496,15 @@ event_create:
   idempotency_key: "event-property-1-20261206"
   → event_id: 7301
 
-form_assign: form_id 501, event_id 7301, idempotency_key "assign-place-record-7301"
-form_assign: form_id 502, event_id 7301, idempotency_key "assign-retrieve-record-7301"
+form_assign: form_id 501, event_id 7301, required True, idempotency_key "assign-place-record-7301"
+form_assign: form_id 502, event_id 7301, required True, idempotency_key "assign-retrieve-record-7301"
 sqlite_execute: UPDATE properties SET zensched_event_id = 7301, event_valid_until = '2027-02-03' WHERE property_id = 1;
 
 shift_create: event_id 7301, worker_id 611, start "2026-12-06T09:00:00-06:00",
               end "2026-12-06T09:30:00-06:00", idempotency_key "shift-test-3-retrieve-20261206"
 ```
 
-> Scheduled the long-term retrieve for Sun Dec 6 9:00. The property's ZenSched event had expired (Nov 5), so I renewed it through Feb 3. Short-term tests never need this mid-test roll.
+> Scheduled the long-term retrieve for Sun Dec 6 9:00 (`-06:00` after the clocks changed). The property's ZenSched event had expired (Nov 5), so I renewed it through Feb 3 with a new event key — not the September place-window key. Short-term tests never need this mid-test roll. A 91-day Health Canada test still needs this same two-event roll; one October-to-January event is rejected (60-day cap).
 
 ## Summary of who stored what
 

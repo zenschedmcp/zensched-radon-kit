@@ -18,10 +18,13 @@
 --
 -- NOT A CERTIFIED LAB REPORT. closed_house_log is the owner's local extract
 -- from the Place Record and Retrieve Record (date, property, closed-house,
--- pCi/L, tester). It is not an NRPP/NRSB laboratory analysis, not an EPA
--- AARST protocol package, not a state radon disclosure, and not a mitigation
--- design. Licensed testers still issue whatever their state and certifying
--- body require, on their own forms.
+-- pCi/L, tester). It is not an official ANSI/AARST MAH-2023 measurement,
+-- not a certified radon report, not an NRPP / NRSB / C-NRPP device PDF,
+-- not a Health Canada remediation decision, not a state radon disclosure,
+-- and not a mitigation design. tests.pci_l is a field note typed on the
+-- phone, not the number from the certified CRM / lab PDF. Licensed testers
+-- still issue whatever their state and certifying body require, on their
+-- own forms.
 --
 -- PRIVACY: properties.access_notes (gate codes, lockboxes, dogs, alarm words)
 -- testers.cert_no (NRPP / NRSB / state license), and tests.device_serial live
@@ -506,7 +509,11 @@ SELECT
     || (SELECT value FROM settings WHERE key = 'timezone_offset') AS end_iso,
   'shift-test-' || t.test_id || '-' || v.visit_kind || '-' || strftime('%Y%m%d', v.scheduled_date) AS idempotency_key,
   'loc-property-' || p.property_id AS loc_idempotency_key,
-  'event-property-' || p.property_id || '-' || strftime('%Y%m%d', v.scheduled_date) AS event_idempotency_key
+  CASE
+    WHEN p.event_valid_until IS NULL OR p.event_valid_until < v.scheduled_date
+      THEN 'event-property-' || p.property_id || '-' || strftime('%Y%m%d', v.scheduled_date)
+    ELSE 'event-property-' || p.property_id || '-' || strftime('%Y%m%d', date(p.event_valid_until, '-59 days'))
+  END AS event_idempotency_key
 FROM visits v
 JOIN tests t ON t.test_id = v.test_id
 JOIN properties p ON p.property_id = t.property_id AND p.is_active = 1
@@ -616,7 +623,8 @@ WHERE t.status = 'retrieved'
 ORDER BY t.pci_l DESC, t.retrieve_date;
 
 -- Owner's local closed-house + reading extract. This is the product: GPS-
--- backed place/retrieve plus what the tester typed. Not a lab report.
+-- backed place/retrieve plus what the tester typed. Not an official
+-- MAH-2023 measurement, certified radon report, or NRPP device PDF.
 CREATE VIEW IF NOT EXISTS closed_house_log AS
 SELECT
   t.test_id,

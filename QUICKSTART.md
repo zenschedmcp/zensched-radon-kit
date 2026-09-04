@@ -4,7 +4,7 @@ Setup is about 15 minutes, once. After that everything is plain English to your 
 
 You need: Claude Desktop (or Cursor) and [Node.js LTS](https://nodejs.org/) installed. Nothing else.
 
-Before you start, read the "What this kit is not" section of `README.md`. Short version: this is GPS-verified place-and-retrieve proof plus a local extract of the Place Record and Retrieve Record. It is **not** a certified lab report and **not** a state disclosure.
+Before you start, read the "What this kit is not" section of `README.md`. Short version: this is GPS-verified place-and-retrieve proof plus a local extract of the Place Record and Retrieve Record. It is **not** an official MAH-2023 measurement, **not** a certified radon report, **not** an NRPP device PDF, and **not** a state disclosure. The pCi/L on the Retrieve Record is a field note.
 
 ## 1. Make a data folder
 
